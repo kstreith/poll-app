@@ -9,9 +9,9 @@ namespace PollApp.Web.Controllers
     [ApiController]
     public class PollController : ControllerBase
     {
-        private readonly IPollDocumentStorage _pollDocumentStorage;
+        private readonly IPollStorage _pollDocumentStorage;
 
-        public PollController(IPollDocumentStorage pollDocumentStorage)
+        public PollController(IPollStorage pollDocumentStorage)
         {
             _pollDocumentStorage = pollDocumentStorage;
         }

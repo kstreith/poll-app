@@ -2,7 +2,7 @@
 
 namespace PollApp
 {
-    public interface IPollDocumentStorage
+    public interface IPollStorage
     {
         Task CreatePoll(string id, Poll pollDocument);
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace PollApp.Storage.Cosmos
 {
-    public class CosmosPollDocumentStorage : IPollDocumentStorage
+    public class CosmosPollDocumentStorage : IPollStorage
     {
         private readonly CosmosClient _cosmosClient;
 
@@ -34,6 +34,12 @@ namespace PollApp.Storage.Cosmos
         }
 
         public async Task<Poll> GetPoll(string id)
+        {
+            var container = await Initialize();
+            throw new NotImplementedException();
+        }
+
+        public async Task RecordAnswer(Poll pollDocument, PollAnswer pollAnswer)
         {
             var container = await Initialize();
             throw new NotImplementedException();
