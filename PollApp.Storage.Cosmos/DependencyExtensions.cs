@@ -10,6 +10,7 @@ namespace PollApp.Storage.Cosmos
             var cosmosClient = new CosmosClient(connectionString);
             services.AddSingleton(cosmosClient);
             services.AddTransient<IPollStorage, CosmosPollDocumentStorage>();
+            services.AddSingleton<IPollTabulation, CosmosPollTabulation>();
         }
     }
 }

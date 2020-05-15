@@ -11,6 +11,10 @@
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.8.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PollApp.Storage.Cosmos\PollApp.Storage.Cosmos.csproj" />
+    <ProjectReference Include="..\PollApp\PollApp.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="Settings.job">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

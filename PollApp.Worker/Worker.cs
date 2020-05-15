@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -13,21 +11,20 @@ namespace PollApp.Worker
     {
         private readonly ILogger<Worker> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IPollTabulation _pollTabulation;
 
-        public Worker(ILogger<Worker> logger, IConfiguration configuration)
+        public Worker(ILogger<Worker> logger, IConfiguration configuration, IPollTabulation pollTabulation)
         {
             _logger = logger;
             _configuration = configuration;
+            _pollTabulation = pollTabulation;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                _logger.LogInformation("AppInsights is: {key}", _configuration["ApplicationInsights:InstrumentationKey"]);
-                await Task.Delay(1000, stoppingToken);
-            }
+            _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+            _logger.LogInformation("AppInsights is: {key}", _configuration["ApplicationInsights:InstrumentationKey"]);
+            await _pollTabulation.RunPollTabulationProcess();
         }
     }
 }

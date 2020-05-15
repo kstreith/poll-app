@@ -6,6 +6,8 @@
         private readonly string _partitionKey;
         private readonly string _type;
 
+        public DocumentId() {}
+
         public DocumentId(string resourceId, string partitionKey, string type)
         {
             _resourceId = resourceId.ToLowerInvariant();
@@ -16,5 +18,7 @@
         public string Id => $"{_resourceId}|{_type}";
 
         public string PartitionKey => _partitionKey;
+
+        public string Type => _type;
     }
 }

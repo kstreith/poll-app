@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using PollApp.Web.Models;
 
 namespace PollApp.Web.Controllers
 {
@@ -17,33 +18,56 @@ namespace PollApp.Web.Controllers
         }
 
         [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        public async Task<ActionResult<PollGetRequestModel>> Get(string id)
         {
-            return "value";
+            var poll = await _pollDocumentStorage.GetPoll(id);
+            if (poll == null)
+            {
+                return new NotFoundResult();
+            }
+            return new ActionResult<PollGetRequestModel>(new PollGetRequestModel
+            {
+                Id = id,
+                Name = poll.Name,
+                Question = poll.Question,
+                PossibleAnswers = poll.PossibleAnswers.Select(x => new PollGetRequestModel.PollAnswer
+                {
+                    Id = x.Id,
+                    Answer = x.Answer,
+                    ResponseCount = x.ResponseCount
+                }).ToList()
+            });
         }
 
-        // POST: api/Default
         [HttpPost]
-        public async Task Post([FromBody] string value)
+        public async Task<CreatedAtActionResult> Post([FromBody] PollCreateRequestModel pollCreateRequest)
         {
             var pollId = Guid.NewGuid().ToString();
-            await _pollDocumentStorage.CreatePoll(pollId, new Poll
+            var poll = new Poll
             {
-                Name = "Test",
-                Question = "Have you used NoSql solutions before?",
-                PossibleAnswers = new List<PollAnswer> {
-                    new PollAnswer
-                    {
-                        Id = "Yes",
-                        Answer = "Yes"
-                    },
-                    new PollAnswer
-                    {
-                        Id = "No",
-                        Answer = "No"
-                    }
-                }
-            });
+                Name = pollCreateRequest.Name,
+                Question = pollCreateRequest.Question,
+            };
+            poll.SetAnswers(pollCreateRequest.PossibleAnswers);
+            await _pollDocumentStorage.CreatePoll(pollId, poll);
+            return new CreatedAtActionResult(nameof(Get), nameof(PollController), new { id = pollId }, null);
+        }
+
+        [HttpPost("{id}/answer/{answerId}")]
+        public async Task<ActionResult> Post(string id, string answerId)
+        {
+            var poll = await _pollDocumentStorage.GetPoll(id);
+            if (poll == null)
+            {
+                return new NotFoundResult();
+            }
+            var foundAnswer = poll.PossibleAnswers.SingleOrDefault(x => x.Id == answerId);
+            if (foundAnswer == null)
+            {
+                return new NotFoundResult();
+            }
+            await _pollDocumentStorage.RecordAnswer(id, foundAnswer);
+            return new OkResult();
         }
     }
 }

@@ -8,6 +8,6 @@ namespace PollApp
 
         Task<Poll> GetPoll(string id);
 
-        Task RecordAnswer(Poll pollDocument, PollAnswer pollAnswer);
+        Task RecordAnswer(string id, PollAnswer pollAnswer);
     }
 }

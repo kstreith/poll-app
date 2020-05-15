@@ -1,6 +1,9 @@
 ﻿using Microsoft.Azure.Cosmos;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,20 +34,54 @@ namespace PollApp.Storage.Cosmos
             Container leaseContainer = _cosmosClient.GetContainer("PollDb", "PollLeases");
             Container monitoredContainer = _cosmosClient.GetContainer("PollDb", "PollData");
             ChangeFeedProcessor changeFeedProcessor = monitoredContainer
-                .GetChangeFeedProcessorBuilder<Object>("changeFeedBasic", HandleChangesAsync)
+                .GetChangeFeedProcessorBuilder<JObject>("changeFeedBasic", HandleChangesAsync)
                     .WithInstanceName("consoleHost")
                     .WithLeaseContainer(leaseContainer)
+                    .WithStartTime(DateTime.MinValue.ToUniversalTime())
                     .Build();
             await changeFeedProcessor.StartAsync();
         }
 
-        static async Task HandleChangesAsync(IReadOnlyCollection<Object> changes, CancellationToken cancellationToken)
+        async Task HandleChangesAsync(IReadOnlyCollection<JObject> changes, CancellationToken cancellationToken)
         {
-            foreach (var item in changes)
+            Container pollContainer = _cosmosClient.GetContainer("PollDb", "PollData");
+            var pollResponseJObject = changes.Where(item => item.ContainsKey("Type") && item["Type"].ToString() == nameof(PollResponseDocument).ToLowerInvariant());
+            var pollResponses = pollResponseJObject.Select(jObject => jObject.ToObject<PollResponseDocument>()).ToList();
+            foreach (var pollResponse in pollResponses)
             {
-                //Console.WriteLine($"\tDetected operation for item with id {item.id}, created at {item.creationTime}.");
+                var pollId = pollResponse.PartitionKey;
+                var pollAnswerId = pollResponse.PollAnswerId;
+                var pollResultDocumentId = new DocumentId(pollId, pollId, nameof(PollResultDocument));
+                PollResultDocument pollResult = null;
+                var newResult = false;
+                try
+                {
+                    pollResult = (await pollContainer.ReadItemAsync<PollResultDocument>(pollResultDocumentId.Id, new PartitionKey(pollResultDocumentId.PartitionKey))).Resource;
+                }
+                catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+                {
+                    newResult = true;
+                    pollResult = new PollResultDocument(pollId);
+                }
+                if (pollResult.PossibleAnswers.ContainsKey(pollAnswerId))
+                {
+                    pollResult.PossibleAnswers[pollAnswerId] = pollResult.PossibleAnswers[pollAnswerId] + 1;
+                }
+                else
+                {
+                    pollResult.PossibleAnswers.Add(pollAnswerId, 0);
+                }
+                if (newResult)
+                {
+                    await pollContainer.CreateItemAsync(pollResult);
+                }
+                else
+                {
+                    await pollContainer.ReplaceItemAsync(pollResult, pollResultDocumentId.Id, new PartitionKey(pollResultDocumentId.PartitionKey));
+                }
+                //Console.WriteLine($"\tProcessing poll response of {item.id}, created at {item.creationTime}.");
                 // Simulate work
-                await Task.Delay(1);
+                //await Task.Delay(1);
             }
         }
     }

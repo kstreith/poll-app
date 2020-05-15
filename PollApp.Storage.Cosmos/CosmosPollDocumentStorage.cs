@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Cosmos;
 using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PollApp.Storage.Cosmos
@@ -36,13 +37,50 @@ namespace PollApp.Storage.Cosmos
         public async Task<Poll> GetPoll(string id)
         {
             var container = await Initialize();
-            throw new NotImplementedException();
+            var pollDocumentId = new DocumentId(id, id, nameof(PollDocument));
+            PollDocument pollDocument = null;
+            try
+            {
+                pollDocument = (await container.ReadItemAsync<PollDocument>(pollDocumentId.Id, new PartitionKey(pollDocumentId.PartitionKey))).Resource;
+            }
+            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+            var pollResultDocumentId = new DocumentId(id, id, nameof(PollResultDocument));
+            PollResultDocument pollResultDocument = null;
+            try
+            {
+                pollResultDocument = (await container.ReadItemAsync<PollResultDocument>(pollResultDocumentId.Id, new PartitionKey(pollResultDocumentId.PartitionKey))).Resource;
+            }
+            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+            }
+            var pollAnswerResponses = pollResultDocument?.PossibleAnswers;
+            return new Poll
+            {
+                Name = pollDocument.Name,
+                Question = pollDocument.Question,
+                PossibleAnswers = pollDocument.PossibleAnswers.Select(answer => {
+                    var responseCount = 0;
+                    if (pollAnswerResponses?.ContainsKey(answer.Id) == true)
+                    {
+                        responseCount = pollAnswerResponses[answer.Id];
+                    }
+                    return new PollAnswer(answer.Id, answer.Answer, responseCount);
+                }).ToList()
+            };
         }
 
-        public async Task RecordAnswer(Poll pollDocument, PollAnswer pollAnswer)
+        public async Task RecordAnswer(string id, PollAnswer pollAnswer)
         {
             var container = await Initialize();
-            throw new NotImplementedException();
+            var responseId = Guid.NewGuid().ToString();
+            var pollResponse = new PollResponseDocument(responseId, id)
+            {
+                PollAnswerId = pollAnswer.Id
+            };
+            await container.CreateItemAsync(pollResponse);
         }
     }
 }

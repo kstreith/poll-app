@@ -8,13 +8,18 @@ namespace PollApp
 
         public Document(DocumentId documentId)
         {
+            PartitionKey = documentId?.PartitionKey;
+            Id = documentId?.Id;
+            Type = documentId?.Type;
             _documentId = documentId;
         }
 
         [JsonProperty("id")]
-        public string Id => _documentId.Id;
+        internal string Id;
 
         [JsonProperty("partitionKey")]
-        public string PartitionKey => _documentId.PartitionKey;
+        internal string PartitionKey;
+
+        internal string Type;
     }
 }

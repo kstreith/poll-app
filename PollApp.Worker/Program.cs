@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PollApp.Storage.Cosmos;
 
 namespace PollApp.Worker
 {
@@ -19,6 +20,7 @@ namespace PollApp.Worker
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<Worker>();
+                    services.AddCosmosStorage(hostContext.Configuration["Cosmos:ConnectionString"]);
                     services.AddApplicationInsightsTelemetryWorkerService();
                 });
     }
