@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <ApplicationInsightsResourceId>/subscriptions/277bc2b3-89d9-4862-8005-56a7585f537d/resourcegroups/poll-app-rg/providers/microsoft.insights/components/poll-app</ApplicationInsightsResourceId>
+    <UserSecretsId>610f33a0-8d64-49d8-a9a5-5ceb4dda5427</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.12.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
+  </ItemGroup>
+
+</Project>
