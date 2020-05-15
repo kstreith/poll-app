@@ -7,5 +7,7 @@ namespace PollApp
         Task CreatePoll(string id, Poll pollDocument);
 
         Task<Poll> GetPoll(string id);
+
+        Task RecordAnswer(Poll pollDocument, PollAnswer pollAnswer);
     }
 }

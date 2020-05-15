@@ -20,6 +20,5 @@ namespace PollApp.Storage.Cosmos
         public string Question { get; set; }
 
         public List<PollAnswer> PossibleAnswers { get; set; }
-
     }
 }
