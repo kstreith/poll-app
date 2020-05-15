@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker;Microsoft.NET.Sdk.Publish">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UserSecretsId>610f33a0-8d64-49d8-a9a5-5ceb4dda5427</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>

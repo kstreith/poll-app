@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using PollApp.Models;
+using PollApp.Web.Models;
 
-namespace PollApp.Controllers
+namespace PollApp.Web.Controllers
 {
     public class HomeController : Controller
     {

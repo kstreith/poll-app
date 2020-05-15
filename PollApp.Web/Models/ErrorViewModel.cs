@@ -1,6 +1,6 @@
 using System;
 
-namespace PollApp.Models
+namespace PollApp.Web.Models
 {
     public class ErrorViewModel
     {
