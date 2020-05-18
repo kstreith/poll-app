@@ -7,9 +7,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PollApp.Worker", "PollApp.W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PollApp.Web", "PollApp.Web\PollApp.Web.csproj", "{72A5FC66-3C39-4EF4-AFED-00AD0A603280}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PollApp", "PollApp\PollApp.csproj", "{92920DB2-9A87-456C-AEE0-5B1CB8FBA6EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PollApp", "PollApp\PollApp.csproj", "{92920DB2-9A87-456C-AEE0-5B1CB8FBA6EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PollApp.Storage.Cosmos", "PollApp.Storage.Cosmos\PollApp.Storage.Cosmos.csproj", "{8C8C5CC0-9593-4E3A-B888-208C395F61DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PollApp.Storage.Cosmos", "PollApp.Storage.Cosmos\PollApp.Storage.Cosmos.csproj", "{8C8C5CC0-9593-4E3A-B888-208C395F61DC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B99D3088-2771-4110-AEDC-AA0D6A69D50B}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

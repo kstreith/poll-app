@@ -46,12 +46,12 @@
 		{:else}
 		<div class="row justify-content-center">
 			<div class="col-lg-8 col-12">
-				<form>
+				<form on:submit|preventDefault="{loadPoll}">
 					<div class="form-group">
 						<label for="poll">Poll Id</label>
 						<input type="text" class="form-control" id="poll" placeholder="Identifier of the poll to view" bind:value="{pollIdToLoad}" />
 					</div>
-					<button type="button" class="btn btn-primary" on:click="{loadPoll}">View Poll</button>
+					<button type="submit" class="btn btn-primary">View Poll</button>
 				</form>
 			</div>
 		</div>
