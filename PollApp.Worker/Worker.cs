@@ -23,7 +23,6 @@ namespace PollApp.Worker
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-            _logger.LogInformation("AppInsights is: {key}", _configuration["ApplicationInsights:InstrumentationKey"]);
             await _pollTabulation.RunPollTabulationProcess();
         }
     }

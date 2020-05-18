@@ -22,3 +22,9 @@ and
 ```
 dotnet run --project .\PollApp.Worker\PollApp.Worker.csproj
 ```
+
+Sample Cosmos Queries
+---------------------
+SELECT c.id FROM c WHERE c.Type = "polldocument"
+
+SELECT c.id FROM c WHERE c.Type = "polldocument" and ARRAY_LENGTH(c.PossibleAnswers) > 3

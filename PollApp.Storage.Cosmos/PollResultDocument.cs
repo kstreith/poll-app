@@ -12,6 +12,8 @@ namespace PollApp.Storage.Cosmos
         {
         }
 
+        [JsonProperty("_etag")]
+        public string ETag { get; set; }
         public Dictionary<string, int> PossibleAnswers { get; set; } = new Dictionary<string, int>();
     }
 }

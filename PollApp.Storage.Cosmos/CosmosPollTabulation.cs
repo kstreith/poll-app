@@ -44,45 +44,58 @@ namespace PollApp.Storage.Cosmos
 
         async Task HandleChangesAsync(IReadOnlyCollection<JObject> changes, CancellationToken cancellationToken)
         {
-            Container pollContainer = _cosmosClient.GetContainer("PollDb", "PollData");
+            var allChangesCount = changes.Count;
             var pollResponseJObject = changes.Where(item => item.ContainsKey("Type") && item["Type"].ToString() == nameof(PollResponseDocument).ToLowerInvariant());
             var pollResponses = pollResponseJObject.Select(jObject => jObject.ToObject<PollResponseDocument>()).ToList();
+            var pollResponsesCount = pollResponses.Count;
+            Container pollContainer = _cosmosClient.GetContainer("PollDb", "PollData");
             foreach (var pollResponse in pollResponses)
             {
-                var pollId = pollResponse.PartitionKey;
-                var pollAnswerId = pollResponse.PollAnswerId;
-                var pollResultDocumentId = new DocumentId(pollId, pollId, nameof(PollResultDocument));
-                PollResultDocument pollResult = null;
-                var newResult = false;
-                try
-                {
-                    pollResult = (await pollContainer.ReadItemAsync<PollResultDocument>(pollResultDocumentId.Id, new PartitionKey(pollResultDocumentId.PartitionKey))).Resource;
-                }
-                catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-                {
-                    newResult = true;
-                    pollResult = new PollResultDocument(pollId);
-                }
-                if (pollResult.PossibleAnswers.ContainsKey(pollAnswerId))
-                {
-                    pollResult.PossibleAnswers[pollAnswerId] = pollResult.PossibleAnswers[pollAnswerId] + 1;
-                }
-                else
-                {
-                    pollResult.PossibleAnswers.Add(pollAnswerId, 1);
-                }
-                if (newResult)
-                {
-                    await pollContainer.CreateItemAsync(pollResult);
-                }
-                else
-                {
-                    await pollContainer.ReplaceItemAsync(pollResult, pollResultDocumentId.Id, new PartitionKey(pollResultDocumentId.PartitionKey));
-                }
-                //Console.WriteLine($"\tProcessing poll response of {item.id}, created at {item.creationTime}.");
-                // Simulate work
-                //await Task.Delay(1);
+                var existingPollResult = await GetExistingPollResults(pollContainer, pollResponse.PartitionKey);
+                var updatedPollResults = CalculateUpdatedResults(existingPollResult, pollResponse);
+                await SavePollResult(pollContainer, updatedPollResults);                
             }
+        }
+
+        private static async Task<PollResultDocument> GetExistingPollResults(Container pollContainer, string pollId)
+        {
+            var pollResultDocumentId = new DocumentId(pollId, pollId, nameof(PollResultDocument));
+            try
+            {
+                var existingPollResult = (await pollContainer.ReadItemAsync<PollResultDocument>(pollResultDocumentId.Id, new PartitionKey(pollResultDocumentId.PartitionKey))).Resource;
+                return existingPollResult;
+            }
+            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+        }
+
+        private static async Task SavePollResult(Container pollContainer, PollResultDocument pollResult)
+        {
+            if (pollResult.ETag == null)
+            {
+                await pollContainer.CreateItemAsync(pollResult);
+            }
+            else
+            {
+                await pollContainer.ReplaceItemAsync(pollResult, pollResult.Id, new PartitionKey(pollResult.PartitionKey));
+            }
+        }
+
+        private static PollResultDocument CalculateUpdatedResults(PollResultDocument pollResult, PollResponseDocument pollResponse)
+        {
+            pollResult = pollResult ?? new PollResultDocument(pollResponse.PartitionKey);
+            var pollAnswerId = pollResponse.PollAnswerId;
+            if (pollResult.PossibleAnswers.ContainsKey(pollResponse.PollAnswerId))
+            {
+                pollResult.PossibleAnswers[pollAnswerId] = pollResult.PossibleAnswers[pollAnswerId] + 1;
+            }
+            else
+            {
+                pollResult.PossibleAnswers.Add(pollAnswerId, 1);
+            }
+            return pollResult;
         }
     }
 }
