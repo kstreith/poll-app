@@ -3,11 +3,12 @@
 	const dispatch = createEventDispatcher();
 	let poll = {};
 	let displayMode = 'loading';
+	export let pollApiHost = "";
 	export function loadPoll(pollId)
 	{
 		displayMode = 'loading';
 		if (pollId) {
-            fetch('https://poll-app.azurewebsites.net/api/poll/' + pollId, { method: 'GET' })
+            fetch(`${pollApiHost}/api/poll/${pollId}`, { method: 'GET' })
             .then(function(response) {
                 if (!response.ok) {
                     throw new Error ('HTTP status code' + response.status);
@@ -31,7 +32,7 @@
 		if (!answerId || !poll.id) {
 			return;
 		}
-		fetch(`https://poll-app.azurewebsites.net/api/poll/${poll.id}/answer/${answerId}`, { method: 'POST' })
+		fetch(`${pollApiHost}/api/poll/${poll.id}/answer/${answerId}`, { method: 'POST' })
 		.then(function(response) {
 			if (!response.ok) {
                     throw new Error ('HTTP status code' + response.status);

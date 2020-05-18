@@ -28,7 +28,6 @@ namespace PollApp.Web.Controllers
             return new ActionResult<PollGetRequestModel>(new PollGetRequestModel
             {
                 Id = id,
-                Name = poll.Name,
                 Question = poll.Question,
                 PossibleAnswers = poll.PossibleAnswers.Select(x => new PollGetRequestModel.PollAnswer
                 {
@@ -45,12 +44,10 @@ namespace PollApp.Web.Controllers
             var pollId = Guid.NewGuid().ToString();
             var poll = new Poll
             {
-                Name = pollCreateRequest.Name,
                 Question = pollCreateRequest.Question,
             };
             poll.SetAnswers(pollCreateRequest.PossibleAnswers);
-            await _pollDocumentStorage.CreatePoll(pollId, poll);
-            //return new CreatedAtActionResult(nameof(Get), nameof(PollController), new { id = pollId }, null);
+            await _pollDocumentStorage.CreatePoll(pollCreateRequest.Id ?? pollId, poll);
             return new OkResult();
         }
 

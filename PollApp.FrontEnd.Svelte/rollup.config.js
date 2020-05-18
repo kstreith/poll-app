@@ -5,14 +5,18 @@ import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 
 const production = !process.env.ROLLUP_WATCH;
-
+var host = "https://localhost:5001";
+if (production) {
+	host = "";
+}
 export default {
 	input: 'src/main.js',
 	output: {
 		sourcemap: true,
 		format: 'iife',
 		name: 'app',
-		file: 'public/build/bundle.js'
+		file: 'public/build/bundle.js',
+		intro: `var poll_api_host = "${host}";`
 	},
 	plugins: [
 		svelte({

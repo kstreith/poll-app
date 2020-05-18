@@ -28,7 +28,6 @@ namespace PollApp.Storage.Cosmos
             var container = await Initialize();
             await container.CreateItemAsync(new PollDocument(id)
             {
-                Name = pollDocument.Name,
                 Question = pollDocument.Question,
                 PossibleAnswers = pollDocument.PossibleAnswers.Select(answer => new PollDocument.PollAnswer { Id = answer.Id, Answer = answer.Answer }).ToList()
             });
@@ -59,7 +58,6 @@ namespace PollApp.Storage.Cosmos
             var pollAnswerResponses = pollResultDocument?.PossibleAnswers;
             return new Poll
             {
-                Name = pollDocument.Name,
                 Question = pollDocument.Question,
                 PossibleAnswers = pollDocument.PossibleAnswers.Select(answer => {
                     var responseCount = 0;

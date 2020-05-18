@@ -6,7 +6,7 @@ namespace PollApp
 {
     public class Poll
     {
-        public string Name { get; set; }
+        public string Id { get; set; }
 
         public string Question { get; set; }
 

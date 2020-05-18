@@ -3,6 +3,8 @@
 	};
 	let displayMode = 'loading';
 	export let pollId = "";
+	export let pollApiHost = "";
+	var refreshInterval;
 	function updatePollAndPercentages(json)
 	{
 		let totalResponseCount = json.possibleAnswers.reduce(function (sum, answer) {
@@ -17,7 +19,7 @@
 		poll = json;
 	}
 	function refreshPoll() {
-		fetch('https://poll-app.azurewebsites.net/api/poll/' + poll.id, { method: 'GET' })
+		fetch(`${pollApiHost}/api/poll/${pollId}`, { method: 'GET' })
 		.then(function(response) {
 			if (!response.ok) {
 				throw new Error ('HTTP status code' + response.status);
@@ -25,14 +27,16 @@
 			return response.json();
 		}).then(function (json) {
 			updatePollAndPercentages(json);
+		}).catch(function (err) {
+			clearInterval(refreshInterval);
 		});
 	}
 	function startPollRefresh()
 	{
-		setInterval(refreshPoll, 500);
+		refreshInterval = setInterval(refreshPoll, 500);
 	}
 	if (pollId) {
-		fetch('https://poll-app.azurewebsites.net/api/poll/' + pollId, { method: 'GET' })
+		fetch(`${pollApiHost}/api/poll/${pollId}`, { method: 'GET' })
 		.then(function(response) {
 			if (!response.ok) {
 				throw new Error ('HTTP status code' + response.status);

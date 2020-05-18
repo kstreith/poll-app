@@ -4,7 +4,7 @@ namespace PollApp.Web.Models
 {
     public class PollCreateRequestModel
     {
-        public string Name { get; set; }
+        public string Id { get; set; }
 
         public string Question { get; set; }
 
