@@ -33,14 +33,14 @@ namespace PollApp.Web.Controllers
                 PossibleAnswers = poll.PossibleAnswers.Select(x => new PollGetRequestModel.PollAnswer
                 {
                     Id = x.Id,
-                    Answer = x.Answer,
+                    Text = x.Answer,
                     ResponseCount = x.ResponseCount
                 }).ToList()
             });
         }
 
         [HttpPost]
-        public async Task<CreatedAtActionResult> Post([FromBody] PollCreateRequestModel pollCreateRequest)
+        public async Task<ActionResult> Post([FromBody] PollCreateRequestModel pollCreateRequest)
         {
             var pollId = Guid.NewGuid().ToString();
             var poll = new Poll
@@ -50,7 +50,8 @@ namespace PollApp.Web.Controllers
             };
             poll.SetAnswers(pollCreateRequest.PossibleAnswers);
             await _pollDocumentStorage.CreatePoll(pollId, poll);
-            return new CreatedAtActionResult(nameof(Get), nameof(PollController), new { id = pollId }, null);
+            //return new CreatedAtActionResult(nameof(Get), nameof(PollController), new { id = pollId }, null);
+            return new OkResult();
         }
 
         [HttpPost("{id}/answer/{answerId}")]

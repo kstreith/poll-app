@@ -20,6 +20,7 @@ namespace PollApp
         [JsonProperty("partitionKey")]
         internal string PartitionKey;
 
+        [JsonProperty("Type")]
         internal string Type;
     }
 }

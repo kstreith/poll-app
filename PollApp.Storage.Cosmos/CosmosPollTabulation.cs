@@ -69,7 +69,7 @@ namespace PollApp.Storage.Cosmos
                 }
                 else
                 {
-                    pollResult.PossibleAnswers.Add(pollAnswerId, 0);
+                    pollResult.PossibleAnswers.Add(pollAnswerId, 1);
                 }
                 if (newResult)
                 {

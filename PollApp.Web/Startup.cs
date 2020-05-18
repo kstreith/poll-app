@@ -19,6 +19,13 @@ namespace PollApp.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyOrigin().AllowAnyMethod();
+                });
+            });
             services.AddControllersWithViews();
             services.AddApplicationInsightsTelemetry();
             services.AddCosmosStorage(Configuration["Cosmos:ConnectionString"]);
@@ -38,18 +45,17 @@ namespace PollApp.Web
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseCors();
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+            app.UseEndpoints(endpoints => {
+                endpoints.MapControllers();
             });
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
         }
     }
 }

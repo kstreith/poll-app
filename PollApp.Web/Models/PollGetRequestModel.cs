@@ -7,7 +7,7 @@ namespace PollApp.Web.Models
         public class PollAnswer
         {
             public string Id { get; set; }
-            public string Answer { get; set; }
+            public string Text { get; set; }
             public int ResponseCount { get; set; }
         }
 
