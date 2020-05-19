@@ -17,7 +17,7 @@ namespace PollApp.Storage.Cosmos
 
         private async Task<Container> Initialize()
         {
-            Database db = await _cosmosClient.CreateDatabaseIfNotExistsAsync("PollDb");
+            Database db = await _cosmosClient.CreateDatabaseIfNotExistsAsync("PollDb", 400);
             Container container = await db.CreateContainerIfNotExistsAsync(
                 new ContainerProperties { Id = "PollData", DefaultTimeToLive = -1, PartitionKeyPath = "/partitionKey" });
             return container;
