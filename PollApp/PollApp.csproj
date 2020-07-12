@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <UserSecretsId>d0b5ee0c-2c27-4aa8-a4ef-899c4e50ee1b</UserSecretsId>
   </PropertyGroup>
 
 </Project>

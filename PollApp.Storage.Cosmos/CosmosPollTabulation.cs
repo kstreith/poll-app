@@ -42,7 +42,7 @@ namespace PollApp.Storage.Cosmos
             await changeFeedProcessor.StartAsync();
         }
 
-        async Task HandleChangesAsync(IReadOnlyCollection<JObject> changes, CancellationToken cancellationToken)
+        public async Task RunTabulation(IReadOnlyCollection<JObject> changes)
         {
             var allChangesCount = changes.Count;
             var pollResponseJObject = changes.Where(item => item.ContainsKey("Type") && item["Type"].ToString() == nameof(PollResponseDocument).ToLowerInvariant());
@@ -53,8 +53,13 @@ namespace PollApp.Storage.Cosmos
             {
                 var existingPollResult = await GetExistingPollResults(pollContainer, pollResponse.PartitionKey);
                 var updatedPollResults = CalculateUpdatedResults(existingPollResult, pollResponse);
-                await SavePollResult(pollContainer, updatedPollResults);                
+                await SavePollResult(pollContainer, updatedPollResults);
             }
+        }
+
+        async Task HandleChangesAsync(IReadOnlyCollection<JObject> changes, CancellationToken cancellationToken)
+        {
+            await RunTabulation(changes);
         }
 
         private static async Task<PollResultDocument> GetExistingPollResults(Container pollContainer, string pollId)
@@ -79,7 +84,7 @@ namespace PollApp.Storage.Cosmos
             }
             else
             {
-                await pollContainer.ReplaceItemAsync(pollResult, pollResult.Id, new PartitionKey(pollResult.PartitionKey));
+                await pollContainer.ReplaceItemAsync(pollResult, pollResult.Id, new PartitionKey(pollResult.PartitionKey), new ItemRequestOptions { IfMatchEtag = pollResult.ETag });
             }
         }
 
